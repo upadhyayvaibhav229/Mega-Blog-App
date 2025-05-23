@@ -9,10 +9,17 @@ app.use(cors({
     credentials: true,
 }));
 
+import authRouter from "./Routes/auth.routes.js"
+app.use("/api/auth", authRouter)
+
+import postRouter from "./Routes/post.routes.js"
+app.use("/api/post", postRouter)
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
+
 
 
 export {app}

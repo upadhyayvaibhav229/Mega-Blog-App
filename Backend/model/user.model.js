@@ -3,11 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"; // ✅ Added missing import
 
 const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
+  fullName: {
     type: String,
     required: true,
   },
@@ -36,12 +32,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  resetOtpExpiredAt: { // ✅ Fixed typo
+  resetOtpExpiredAt: {
+    // ✅ Fixed typo
     type: Number,
     default: 0,
   },
   refreshToken: {
-    type: String
+    type: String,
   },
 });
 

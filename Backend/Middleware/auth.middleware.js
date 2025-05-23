@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../Models/user.models.js";
+import { User } from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 
@@ -46,6 +46,3 @@ export const verifyJwt = asyncHandler(async (req, res, next) => {
   }
 });
 
-//  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODE5ZWQzZjYwZjJlOThhOTllMjgwMjEiLCJlbWFpbCI6InVwYWRoeWF5dmFpYmhhdjIyOUBnbWFpbC5jb20iLCJmdWxsTmFtZSI6InZhaWJoYXYgdXBhZGQiLCJpYXQiOjE3NDY2MTgyMDksImV4cCI6MTc0NjcwNDYwOX0.yqy__qSNwfGVUmjLGvGp8v0MZrvvld6FzcelaOuPpbo
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2ODE5ZWQzZjYwZjJlOThhOTllMjgwMjEiLCJlbWFpbCI6InVwYWRoeWF5dmFpYmhhdjIyOUBnbWFpbC5jb20iLCJmdWxsTmFtZSI6InZhaWJoYXYgdXBhZGQiLCJpYXQiOjE3NDY2MTg0MjksImV4cCI6MTc0NjcwNDgyOX0.uBn2nTfLJdPoMEZFh3mqArzXhQOn0fw6RoA-ADvmYTM

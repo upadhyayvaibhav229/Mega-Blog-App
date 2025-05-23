@@ -1,6 +1,8 @@
-import { asyncHandler } from "../utils/asynchandler";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
+import { asyncHandler } from "../utils/asynchandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { User } from "../model/user.model.js";
+
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -20,12 +22,13 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
   }
 };
 
-const registerUser = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+const registerUser = asyncHandler(async (req, res) => {
+  const { fullName, email, password } = req.body;
+  
   console.log("Register Request:", req.body);
 
   // 1. Validate required fields
-  if (!(firstName && lastName && email && password)) {
+  if (!(fullName && email && password)) {
     return res.status(400).json({
       success: false,
       message: "All fields are required",
@@ -43,8 +46,7 @@ const registerUser = async (req, res) => {
 
   // 3. Create new user
   const user = await User.create({
-    firstName,
-    lastName,
+    fullName,
     email,
     password,
   });
@@ -55,29 +57,16 @@ const registerUser = async (req, res) => {
     throw new ApiError(500, "User could not be retrieved after creation");
   }
 
-  // 5. Send welcome email
-  const mailOptions = {
-    from: process.env.SENDER_EMAIL,
-    to: email,
-    subject: "W+-elcome to our platform!",
-    text: `Welcome ${firstName} ${lastName},\n\nYou have successfully registered on our platform.`,
-  };
+ 
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.messageId);
-  } catch (emailError) {
-    console.error("Error sending welcome email:", emailError.message);
-    // Optional: don't fail registration if email fails
-  }
-
-  // 6. Send success response
+ 
+  // 5. Send success response
   return res.status(201).json({
     success: true,
     message: "User registered successfully",
     data: createdUser,
   });
-};
+});
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
@@ -207,7 +196,7 @@ const refershAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export default {
+export  {
   registerUser,
   loginUser,
   logoutUser,
