@@ -1,17 +1,24 @@
-import {Router} from 'express'
+// routes/auth.routes.js
+import express from "express";
 import {
-    loginUser,
-    logoutUser,
-    registerUser,
-    refershAccessToken,
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  getcurrentUser,
+  changeCurrentPassword,
+  updateAccountDetails,
 } from "../Controllers/auth.controllers.js";
-import { verifyJwt } from '../Middleware/auth.middleware.js';
+import { verifyJwt } from "../Middleware/auth.middleware.js";
 
-const router = Router()
+const router = express.Router();
 
-router.post('/login', loginUser);
-router.post('/logout', logoutUser, verifyJwt);
-router.post('/registerUser', registerUser);
-router.post('/refershAccessToken', refershAccessToken, verifyJwt);
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
+router.route("/logout").post(verifyJwt, logoutUser);
+router.route("/refresh").post(refreshAccessToken);
+router.route("/current-user").get(verifyJwt, getcurrentUser);
+router.route('/change-password').post(verifyJwt, changeCurrentPassword);    
+router.route('/update-details').post(verifyJwt, updateAccountDetails);
 
-export default router
+export default router;

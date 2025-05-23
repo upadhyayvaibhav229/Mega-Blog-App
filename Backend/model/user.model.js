@@ -68,7 +68,8 @@ userSchema.methods.generateAccessToken = function () {
     {
       _id: this._id,
       email: this.email,
-      fullName: `${this.firstName} ${this.lastName}`, // ✅ Dynamically build fullName
+      fullName: this.fullName, // ✅ fixed usage of fullName
+
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
