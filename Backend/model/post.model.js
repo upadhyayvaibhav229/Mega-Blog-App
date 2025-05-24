@@ -30,6 +30,7 @@ const postSchema = new Schema({
     },
     author: {
         type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
 }, { timestamps: true });
