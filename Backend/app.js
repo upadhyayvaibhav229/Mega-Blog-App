@@ -15,10 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 // Routes after middleware
-import authRouter from "./Routes/auth.routes.js"
+import authRouter from "./routes/auth.routes.js"
 app.use("/api/auth", authRouter)
 
-import postRouter from "./Routes/post.routes.js"
-app.use("/api/post", postRouter)
+import postRouter from "./routes/post.routes.js"
+app.use("/api/posts", postRouter)
 
 export { app }
