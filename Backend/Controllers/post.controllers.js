@@ -5,35 +5,42 @@ import { ApiError } from "../utils/ApiError.js";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const createPost = asyncHandler(async (req, res) => {
   if (!req.user) throw new ApiError(401, "Unauthorized");
 
   const { title, slug, content, status } = req.body;
-  const file = req.file;
-
-  if (!file) throw new ApiError(400, "Image file is required");
 
   if ([title, slug, content, status].some((f) => !f?.trim())) {
     throw new ApiError(400, "All fields are required");
   }
 
-  const imageUrl = `/temp/${file.filename}`; // Assuming multer saved in public/temp
+  const featuredImagePath = req.file?.path;
+  if (!featuredImagePath) {
+    throw new ApiError(400, "Featured image is required");
+  }
 
-  const newPost = new Posts({
+  const cloudinaryImage = await uploadOnCloudinary(featuredImagePath);
+  if (!cloudinaryImage?.url) {
+    throw new ApiError(500, "Image upload failed");
+  }
+
+  console.log(cloudinaryImage);
+  
+  const newPost = await Posts.create({
     title,
-    slug,
     content,
-    featuredImage: imageUrl,
     status,
+    slug,
+    featuredImage: cloudinaryImage.url,
     userId: req.user._id,
     author: req.user._id,
   });
 
-  const savedPost = await newPost.save();
-  await savedPost.populate("author", "name email");
+  await newPost.populate("author", "name email");
 
-  res.status(201).json(new ApiResponse(true, "Post created", savedPost));
+  res.status(201).json(new ApiResponse(true, "Post created", newPost));
 });
 
 // get all published post
@@ -46,7 +53,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 // get a single posts by slug (public routes)
 const getPostBySlug = asyncHandler(async (req, res) => {
-  const {slug} = req.params;
+  const { slug } = req.params;
   const post = await Posts.findOne({ slug });
   if (!post) {
     throw new ApiError(400, "Post not found");
@@ -56,23 +63,35 @@ const getPostBySlug = asyncHandler(async (req, res) => {
 });
 
 const updatePost = asyncHandler(async (req, res) => {
-  if (!req.user) throw new ApiError(401, "Not Authorize to edit the Post");
+  if (!req.user) throw new ApiError(401, "Not authorized to edit the post");
 
   const { slug } = req.params;
-  const { title, content, featuredImage, status } = req.body;
+  const { title, content, status } = req.body;
   const post = await Posts.findOne({ slug });
 
   if (!post) throw new ApiError(404, "Post not found");
 
-  // check ownership
+  // Check ownership
   if (!post.userId.equals(req.user._id)) {
-    throw new ApiError(401, "Not Authorize to edit the Post");
+    throw new ApiError(401, "Not authorized to edit the post");
   }
 
-  // update only provided field
+  // Handle image upload
+  const featuredImagePath = req.file?.path;  // <-- here
+  console.log("featuredImagePath:", featuredImagePath);
+  console.log("req.file:", req.file);
+
+  if (featuredImagePath) {
+    const cloudinaryImage = await uploadOnCloudinary(featuredImagePath);
+    if (!cloudinaryImage?.url) {
+      throw new ApiError(500, "Image upload failed");
+    }
+    post.featuredImage = cloudinaryImage.url;
+  }
+
+  // Update only provided fields
   if (title !== undefined) post.title = title;
   if (content !== undefined) post.content = content;
-  if (featuredImage !== undefined) post.featuredImage = featuredImage;
   if (status !== undefined) post.status = status;
 
   const updatedPost = await post.save();
@@ -80,6 +99,7 @@ const updatePost = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(true, "Post updated successfully", updatedPost));
 });
+
 
 const deletePost = asyncHandler(async (req, res) => {
   if (!req.user) throw new ApiError(401, "unauthorized to delete blogs");
@@ -97,12 +117,13 @@ const deletePost = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Post deleted successfully" });
 });
 
-
 const UPLOAD_DIR = path.join(process.cwd(), "public", "temp");
 
 const uploadFile = (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "No file uploaded" });
+    return res
+      .status(400)
+      .json({ success: false, message: "No file uploaded" });
   }
 
   const uniqueId = uuidv4(); // Generate unique ID
@@ -116,10 +137,14 @@ const uploadFile = (req, res) => {
   fs.rename(oldPath, newPath, (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ success: false, message: "File saving failed" });
+      return res
+        .status(500)
+        .json({ success: false, message: "File saving failed" });
     }
 
-    const fileUrl = `${req.protocol}://${req.get("host")}/public/temp/${newFilename}`;
+    const fileUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/public/temp/${newFilename}`;
 
     // Return file info
     res.status(201).json({
@@ -136,7 +161,9 @@ const uploadFile = (req, res) => {
 const deleteFile = (req, res) => {
   const fileId = req.params.fileId;
   if (!fileId) {
-    return res.status(400).json({ success: false, message: "FileId is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "FileId is required" });
   }
 
   const filePath = path.join(UPLOAD_DIR, fileId);
@@ -150,17 +177,22 @@ const deleteFile = (req, res) => {
   fs.unlink(filePath, (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ success: false, message: "Failed to delete file" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to delete file" });
     }
 
     res.json({ success: true, message: "File deleted" });
   });
 };
+
 const getFilePreview = (req, res) => {
   const fileId = req.params.fileId;
 
   if (!fileId) {
-    return res.status(400).json({ success: false, message: "FileId is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "FileId is required" });
   }
 
   const filePath = path.join(UPLOAD_DIR, fileId);
@@ -172,19 +204,15 @@ const getFilePreview = (req, res) => {
   res.sendFile(filePath);
 };
 
-
-
-
-export { 
-    createPost, 
-    getAllPosts, 
-    getPostBySlug, 
-    updatePost, 
-    deletePost,
-    uploadFile,
-    deleteFile, 
-    getFilePreview
+export {
+  createPost,
+  getAllPosts,
+  getPostBySlug,
+  updatePost,
+  deletePost,
+  uploadFile,
+  deleteFile,
+  getFilePreview,
 };
-
 
 // TODO: upload file on cloudinary from local
