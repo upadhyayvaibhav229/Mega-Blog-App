@@ -1,38 +1,52 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { login as authLogin } from '../store/authSlice';
 import { Button, Input, Logo } from './index';
+import axios from 'axios';
 
 function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const backendUrl = useSelector(state => state.auth.backendUrl);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [error, setError] = useState("");
 
+    // const login = async (data) => {
+    //     setError("");
+
+    //     try {
+    //         const res = await fetch('/api/login', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify(data)
+    //         });
+
+    //         const result = await res.json();
+
+    //         if (!res.ok) {
+    //             throw new Error(result.message || 'Login failed');
+    //         }
+
+    //         dispatch(authLogin(result.user));
+    //         navigate('/');
+    //     } catch (err) {
+    //         setError(err.message);
+    //     }
+    // };
+
     const login = async (data) => {
         setError("");
-
+        axios.defaults.withCredentials = true;
         try {
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            const result = await res.json();
-
-            if (!res.ok) {
-                throw new Error(result.message || 'Login failed');
-            }
-
-            dispatch(authLogin(result.user));
+            const res = await axios.post(`${backendUrl}/api/auth/login`, data);
+            dispatch(authLogin(res.data.user));
             navigate('/');
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || 'Login failed');
         }
-    };
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-r bg-gray-400 px-4">

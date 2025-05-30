@@ -1,8 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 const initialState = {
     status : false,
-    userData: null
+    userData: null,
+    backendUrl
 }
 
 const authSlice = createSlice({
