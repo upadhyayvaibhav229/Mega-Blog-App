@@ -13,34 +13,13 @@ function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [error, setError] = useState("");
 
-    // const login = async (data) => {
-    //     setError("");
-
-    //     try {
-    //         const res = await fetch('/api/login', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify(data)
-    //         });
-
-    //         const result = await res.json();
-
-    //         if (!res.ok) {
-    //             throw new Error(result.message || 'Login failed');
-    //         }
-
-    //         dispatch(authLogin(result.user));
-    //         navigate('/');
-    //     } catch (err) {
-    //         setError(err.message);
-    //     }
-    // };
-
+ 
     const login = async (data) => {
         setError("");
-        axios.defaults.withCredentials = true;
         try {
             const res = await axios.post(`${backendUrl}/api/auth/login`, data);
+            console.log(res);
+            
             dispatch(authLogin(res.data.user));
             navigate('/');
         } catch (err) {

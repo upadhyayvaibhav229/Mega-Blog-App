@@ -51,6 +51,8 @@ const getAllPosts = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(true, "All Posts ", posts));
 });
 
+
+
 // get a single posts by slug (public routes)
 const getPostBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;

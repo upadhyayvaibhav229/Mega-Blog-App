@@ -5,29 +5,35 @@ import authService from "./appwrite/auth"
 import {login, logout} from "./store/authSlice"
 import { Footer, Header } from './components'
 import { Outlet } from 'react-router-dom'
+import axios from 'axios'
 
 function App() {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    authService.getCurrentUser()
-    .then((userData) => {
-      if (userData) {
-        dispatch(login({userData}))
-      } else {
-        dispatch(logout())
-      }
-    })
-    .finally(() => setLoading(false))
-  }, [])
+    useEffect(()=>{
+     const fetchUser = async () => {
+       try {
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/current-user`, {
+          withCredentials: true,
+        });
+        dispatch(login(res.data.user));
+       } catch (error) {
+        dispatch(logout());
+       } finally {
+        setLoading(false);
+       }
+     }
+
+     fetchUser();
+    }, [])
   
   return !loading ? (
     <div className='min-h-screen flex flex-wrap content-between bg-gray-400'>
       <div className='w-full block'>
         <Header />
         <main>
-        TODO:  <Outlet />
+         <Outlet />
         </main>
         <Footer />
       </div>
