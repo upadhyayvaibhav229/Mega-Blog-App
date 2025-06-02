@@ -20,7 +20,7 @@ function Login() {
             const res = await axios.post(`${backendUrl}/api/auth/login`, data);
             console.log(res);
             
-            dispatch(authLogin(res.data.user));
+            dispatch(authLogin(res.data.data));
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');

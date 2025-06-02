@@ -21,4 +21,4 @@ app.use("/api/auth", authRouter)
 import postRouter from "./Routes/post.routes.js"
 app.use("/api/posts", postRouter)
 
-export { app }
+export { app }  

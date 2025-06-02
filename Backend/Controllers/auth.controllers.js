@@ -27,6 +27,8 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 // Register user
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
+  console.log(req.body);
+  
 
   if (!fullName || !email || !password) {
     return res.status(400).json({
@@ -44,8 +46,10 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({ fullName, email, password });
+  
   const createdUser = await User.findById(user._id).select("-password");
-
+  console.log("Created User:", createdUser);
+  
   if (!createdUser) {
     throw new ApiError(500, "User could not be retrieved after creation");
   }

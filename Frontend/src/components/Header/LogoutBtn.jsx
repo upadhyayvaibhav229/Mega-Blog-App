@@ -1,14 +1,13 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import authService from '../../appwrite/auth'
-import {logout} from '../../store/authSlice'
+import axios from 'axios'
 
 function LogoutBtn() {
     const dispatch = useDispatch()
     const logoutHandler = () => {
-        authService.logout().then(() => {
-            dispatch(logout())
-        })
+        const res = axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`);
+        
+        dispatch(logout());
     }
   return (
     <button
