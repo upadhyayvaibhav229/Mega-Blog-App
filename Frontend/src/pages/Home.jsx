@@ -11,9 +11,22 @@ function Home() {
                 const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts/all-posts`, {
                     withCredentials: true,
                 });
-                setPosts(res.data.posts); // adjust if your backend returns differently
+
+                // console.log("✅ API response", res.data);
+
+                const posts = res.data?.message; // ✅ Correct
+                if (posts?.length === 0) {
+                    // console.warn("⚠️ No posts found");
+                } else {
+                    // console.log("✅ Posts fetched:", posts);
+                    setPosts(posts);
+                }
+
+                // console.log("✅ API response", res.data);
+                // console.log("✅ Posts fetched:", posts);
+
             } catch (err) {
-                console.error('Failed to fetch posts:', err);
+                // console.error('❌ Failed to fetch posts:', err);
             }
         };
 
@@ -40,11 +53,15 @@ function Home() {
         <div className='w-full py-8'>
             <Container>
                 <div className='flex flex-wrap'>
-                    {posts?.map?.((post) => (
-                        <div key={post._id} className='p-2 w-1/4'>
-                            <PostCard {...post} />
-                        </div>
-                    ))}
+                    {posts?.map?.((post) => {
+                        {/* console.log("🪵 Rendering PostCard with:", post); // ADD THIS */}
+                        return (
+                            <div key={post._id} className='p-2 w-1/4'>
+                                <PostCard {...post} />
+                            </div>
+                        );
+                    })}
+
                 </div>
             </Container>
         </div>

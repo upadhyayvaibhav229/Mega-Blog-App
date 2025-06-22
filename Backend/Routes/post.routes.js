@@ -17,7 +17,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/all-posts", getAllPosts);
-router.get("/posts/:slug", getPostBySlug);
+router.get("/:slug", getPostBySlug);
 
 // Protected routes
 router.post(

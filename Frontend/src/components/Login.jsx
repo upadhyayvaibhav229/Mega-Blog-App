@@ -17,7 +17,13 @@ function Login() {
     const login = async (data) => {
         setError("");
         try {
-            const res = await axios.post(`${backendUrl}/api/auth/login`, data);
+            const res = await axios.post(
+                `${backendUrl}/api/auth/login`, 
+                data,
+                {
+                    withCredentials: true
+                }
+            );
             console.log(res);
             
             dispatch(authLogin(res.data.data));

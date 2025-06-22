@@ -78,18 +78,23 @@ export default function PostForm({ post }) {
       formData.append("slug", data.slug);
       formData.append("content", data.content);
       formData.append("status", data.status);
-      formData.append("image", data.image[0]); // important
+
+      // ✅ Safe file append
+      if (data.featuredImage && data.featuredImage.length > 0) {
+        formData.append("featuredImage", data.featuredImage[0]);
+      }
 
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/posts/create`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/posts/create-post`,
         {
           method: "POST",
           body: formData,
-          credentials: "include", // include cookies for authentication
+          credentials: "include",
         }
       );
 
       const result = await res.json();
+      console.log("raw res", result);
 
       if (!res.ok) {
         throw new Error(result.message || "Failed to create post");
@@ -150,8 +155,9 @@ export default function PostForm({ post }) {
           type="file"
           className="mb-4"
           accept="image/png, image/jpg, image/jpeg, image/gif"
-          {...register("image", { required: !post })}
+          {...register("featuredImage", { required: !post })}
         />
+
         {post && (
           <div className="w-full mb-4">
             <img
@@ -162,7 +168,7 @@ export default function PostForm({ post }) {
           </div>
         )}
         <Select
-          options={["active", "inactive"]}
+          options={["draft", "published"]} // ✅ use correct values
           label="Status"
           className="mb-4"
           {...register("status", { required: true })}

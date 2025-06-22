@@ -36,7 +36,7 @@ function AllPosts() {
               <PostCard {...post} />
             </div>
           ))}
-        </div>
+        </div> 
       </Container>
     </div>
   );

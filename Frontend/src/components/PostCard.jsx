@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 function PostCard({ slug, title, featuredImage }) {
+  // console.log("🪵 PostCard received:", { slug, title, featuredImage }); // make sure slug is there
+  
   return (
     <Link to={`/post/${slug}`}>
       <div className='w-full bg-gray-100 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-shadow duration-300'>

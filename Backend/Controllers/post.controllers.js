@@ -26,8 +26,8 @@ const createPost = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Image upload failed");
   }
 
-  console.log(cloudinaryImage);
-  
+  // console.log(cloudinaryImage);
+
   const newPost = await Posts.create({
     title,
     content,
@@ -45,12 +45,12 @@ const createPost = asyncHandler(async (req, res) => {
 
 // get all published post
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await Posts.find({ status: "published" }).sort({
-    createAt: -1,
-  });
-  return res.status(200).json(new ApiResponse(true, "All Posts ", posts));
-});
+  const posts = await Posts.find({ status: "published" }).sort({ createdAt: -1 });
 
+  return res.status(200).json(
+    new ApiResponse(true, "All Posts", posts) // ✅ here: "posts" as 3rd arg
+  );
+});
 
 
 // get a single posts by slug (public routes)
@@ -61,7 +61,7 @@ const getPostBySlug = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Post not found");
   }
 
-  return res.status(200).json(new ApiResponse(true, "Post found", post));
+return res.status(200).json(new ApiResponse(true, post, "Post found"));
 });
 
 const updatePost = asyncHandler(async (req, res) => {
@@ -80,8 +80,8 @@ const updatePost = asyncHandler(async (req, res) => {
 
   // Handle image upload
   const featuredImagePath = req.file?.path;  // <-- here
-  console.log("featuredImagePath:", featuredImagePath);
-  console.log("req.file:", req.file);
+  // console.log("featuredImagePath:", featuredImagePath);
+  // console.log("req.file:", req.file);
 
   if (featuredImagePath) {
     const cloudinaryImage = await uploadOnCloudinary(featuredImagePath);
