@@ -14,9 +14,9 @@ function AllPosts() {
             withCredentials: true,
           }
         );
-        console.log("fetched posts", res.data);
+        // console.log("fetched posts", res.data);
         
-        setPosts(res.data.data);
+        setPosts(res.data?.data);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
       }

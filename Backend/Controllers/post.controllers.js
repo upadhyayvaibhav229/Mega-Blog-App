@@ -39,6 +39,8 @@ const createPost = asyncHandler(async (req, res) => {
   });
 
   await newPost.populate("author", "name email");
+  console.log(newPost);
+  
 
   res.status(201).json(new ApiResponse(true, "Post created", newPost));
 });
@@ -48,7 +50,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
   const posts = await Posts.find({ status: "published" }).sort({ createdAt: -1 });
 
   return res.status(200).json(
-    new ApiResponse(true, "All Posts", posts) // ✅ here: "posts" as 3rd arg
+    new ApiResponse(true, posts, "All Posts") // ✅ here: "posts" as 3rd arg
   );
 });
 
@@ -56,7 +58,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 // get a single posts by slug (public routes)
 const getPostBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const post = await Posts.findOne({ slug });
+const post = await Posts.findOne({ slug }).populate("userId", "name email");
   if (!post) {
     throw new ApiError(400, "Post not found");
   }

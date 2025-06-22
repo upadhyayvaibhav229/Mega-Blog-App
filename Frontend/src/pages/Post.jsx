@@ -10,13 +10,16 @@ export default function Post() {
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
-    const isAuthor = post && userData
-    ? (post.userId === userData._id ||
-       post.userId?._id === userData._id)
-    : false;
+    console.log(userData);
+
+const isAuthor = post && userData
+  ? (typeof post.userId === "string"
+      ? post.userId === userData._id
+      : post.userId?._id === userData._id)
+  : false;
 
     console.log(isAuthor);
-    
+
 
 
     useEffect(() => {
@@ -32,7 +35,13 @@ export default function Post() {
 
                 if (result.success) {
                     setPost(result.data);
-                    console.log("🔎 Post content raw:", result.data.content);
+                    if (result.success) {
+                        setPost(result.data);
+
+                        // ADD THIS
+                        // console.log("🧾 post.userId:", result.data.userId);
+                        // console.log("👤 userData._id:", userData?._id);
+                    }
 
                 } else {
                     navigate("/");
@@ -106,7 +115,7 @@ export default function Post() {
 
                 <div className="browser-css">
                     {post.content ? parse(post.content) : "No content available"}
-                    
+
                 </div>
             </Container>
         </div>

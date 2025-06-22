@@ -14,7 +14,7 @@ function Home() {
 
                 // console.log("✅ API response", res.data);
 
-                const posts = res.data?.message; // ✅ Correct
+                const posts = res.data?.data; // ✅ Correct
                 if (posts?.length === 0) {
                     // console.warn("⚠️ No posts found");
                 } else {
@@ -54,7 +54,6 @@ function Home() {
             <Container>
                 <div className='flex flex-wrap'>
                     {posts?.map?.((post) => {
-                        {/* console.log("🪵 Rendering PostCard with:", post); // ADD THIS */}
                         return (
                             <div key={post._id} className='p-2 w-1/4'>
                                 <PostCard {...post} />
