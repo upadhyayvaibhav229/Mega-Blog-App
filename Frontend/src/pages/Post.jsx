@@ -10,7 +10,7 @@ export default function Post() {
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
-    console.log(userData);
+    console.log("userData", userData);
 
 const isAuthor = post && userData
   ? (typeof post.userId === "string"
@@ -19,6 +19,7 @@ const isAuthor = post && userData
   : false;
 
     console.log(isAuthor);
+    
 
 
 
