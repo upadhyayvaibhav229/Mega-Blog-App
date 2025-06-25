@@ -6,7 +6,7 @@ import {login, logout} from "./store/authSlice"
 import { Footer, Header } from './components'
 import { Outlet } from 'react-router-dom'
 import axios from 'axios'
-
+import { ToastContainer } from 'react-toastify'
 function App() {
   const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
@@ -34,6 +34,7 @@ function App() {
         <Header />
         <main>
          <Outlet />
+         <ToastContainer />
         </main>
         <Footer />
       </div>

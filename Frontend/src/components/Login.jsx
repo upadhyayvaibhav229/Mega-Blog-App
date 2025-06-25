@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { login as authLogin } from '../store/authSlice';
 import { Button, Input, Logo } from './index';
 import axios from 'axios';
-
+import { toast } from 'react-toastify';
 function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -25,6 +25,14 @@ function Login() {
                 }
             );
             console.log(res);
+            if (res.data.success === false) {
+                setError(res.data.message);
+                toast.success(res.data.message);
+                
+            }else{
+                toast.error(res.data.message);
+            }
+
             
             dispatch(authLogin(res.data.data));
             navigate('/');
