@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 export default function Post() {
     const [post, setPost] = useState(null);
@@ -12,14 +13,14 @@ export default function Post() {
     const userData = useSelector((state) => state.auth.userData);
     console.log("userData", userData);
 
-const isAuthor = post && userData
-  ? (typeof post.userId === "string"
-      ? post.userId === userData._id
-      : post.userId?._id === userData._id)
-  : false;
+    const isAuthor = post && userData
+        ? (typeof post.userId === "string"
+            ? post.userId === userData._id
+            : post.userId?._id === userData._id)
+        : false;
 
     console.log(isAuthor);
-    
+
 
 
 
@@ -67,22 +68,34 @@ const isAuthor = post && userData
 
     const deletePost = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/posts/delete-post/${post.slug}`, {
-                method: "DELETE",
-                credentials: "include"
-            });
+            const token = localStorage.getItem("token"); // or from Redux state
 
-
+            const res = await fetch(
+                `${import.meta.env.VITE_BACKEND_URL}/api/posts/delete-post/${post.slug}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    credentials: "include", // if your backend needs the refresh-cookie
+                }
+            );
 
             const result = await res.json();
-            if (result.success) {
-                navigate("/");
+            console.log("delete result:", result);
+
+            if (res.ok && result?.success !== false) {
+                toast.success(result?.message || "Post deleted successfully");
+                navigate("/all-posts");
             } else {
-                alert(result.message || "Failed to delete post");
+                toast.error(result?.message || "Could not delete post");
             }
+
+
         } catch (err) {
             console.error("Delete failed:", err);
-            alert("Delete failed");
+            toast.error("Unexpected error deleting post");
         }
     };
 

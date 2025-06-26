@@ -33,8 +33,8 @@ function Login() {
                 toast.error(res.data.message);
             }
 
-            
-            dispatch(authLogin(res.data.data));
+            const {user, accessToken} = res.data.data;
+            dispatch(authLogin({user, accessToken}))
             navigate('/');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
