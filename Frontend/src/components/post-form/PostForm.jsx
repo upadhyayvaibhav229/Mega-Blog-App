@@ -4,6 +4,7 @@ import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } =
@@ -18,6 +19,8 @@ export default function PostForm({ post }) {
 
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
+  const token = useSelector((state) => state.auth.token);
+  const backendUrl = useSelector((state) => state.auth.backendUrl);
 
   const submit = async (data) => {
     try {
@@ -27,32 +30,38 @@ export default function PostForm({ post }) {
       formData.append("content", data.content);
       formData.append("status", data.status);
 
-      // ✅ Safe file append
       if (data.featuredImage && data.featuredImage.length > 0) {
         formData.append("featuredImage", data.featuredImage[0]);
       }
 
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/posts/create-post`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
-      );
+      const endpoint = post
+        ? `${backendUrl}/api/posts/update-posts/${post.slug}`
+        : `${backendUrl}api/posts/create-post`;
+
+      const method = post ? "PUT" : "POST";
+
+      const res = await fetch(`${endpoint}`, {
+        method,
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const result = await res.json();
-      console.log("raw res", result);
 
-      if (!res.ok) {
-        throw new Error(result.message || "Failed to create post");
+      if (!result.success) {
+        throw new Error(result.message);
       }
 
-      console.log("Post created:", result);
+      toast.success(
+        post ? "Post updated successfully" : "Post created successfully"
+      );
+
       navigate(`/post/${result.data.slug}`);
     } catch (err) {
-      console.error("Post creation failed:", err.message);
-      alert("Failed to create post. " + err.message);
+      console.error("Post submit failed:", err.message);
+      toast.error("Failed to submit post: " + err.message);
     }
   };
 
@@ -60,8 +69,8 @@ export default function PostForm({ post }) {
     return value
       ?.trim()
       .toLowerCase()
-      .replace(/[^a-zA-Z0-9\s]/g, "") // remove special characters
-      .replace(/\s+/g, "-"); // replace spaces with hyphens
+      .replace(/[^a-zA-Z0-9\s]/g, "")
+      .replace(/\s+/g, "-");
   }, []);
 
   useEffect(() => {
@@ -109,12 +118,13 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={post.featuredImage} // ✅ direct Cloudinary image URL
               alt={post.title}
               className="rounded-lg"
             />
           </div>
         )}
+
         <Select
           options={["draft", "published"]} // ✅ use correct values
           label="Status"

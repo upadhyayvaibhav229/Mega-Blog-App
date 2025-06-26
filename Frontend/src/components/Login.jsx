@@ -30,7 +30,7 @@ function Login() {
                 toast.success(res.data.message);
                 
             }else{
-                toast.error(res.data.message);
+                toast.success("Login successful");
             }
 
             const {user, accessToken} = res.data.data;
