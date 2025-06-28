@@ -10,9 +10,9 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 const createPost = asyncHandler(async (req, res) => {
   if (!req.user) throw new ApiError(401, "Unauthorized");
 
-  const { title, slug, content, status } = req.body;
+  const { title, slug, content, status, category } = req.body;
 
-  if ([title, slug, content, status].some((f) => !f?.trim())) {
+  if ([title, slug, content, status, category].some((f) => !f?.trim())) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -33,6 +33,7 @@ const createPost = asyncHandler(async (req, res) => {
     content,
     status,
     slug,
+    category,
     featuredImage: cloudinaryImage.url,
     userId: req.user._id,
     author: req.user._id,

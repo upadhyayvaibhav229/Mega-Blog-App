@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
-import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
+// Optional: import categories from a separate config
+export const blogCategories = ['All', 'Technology', 'Startup', 'Lifestyle', 'Finance'];
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, watch, setValue, control, getValues } =
@@ -14,6 +16,7 @@ export default function PostForm({ post }) {
         slug: post?.$id || "",
         content: post?.content || "",
         status: post?.status || "active",
+        category: post?.category || "All", // ✅ Added category default
       },
     });
 
@@ -29,6 +32,7 @@ export default function PostForm({ post }) {
       formData.append("slug", data.slug);
       formData.append("content", data.content);
       formData.append("status", data.status);
+      formData.append("category", data.category); // ✅ Append category
 
       if (data.featuredImage && data.featuredImage.length > 0) {
         formData.append("featuredImage", data.featuredImage[0]);
@@ -36,7 +40,7 @@ export default function PostForm({ post }) {
 
       const endpoint = post
         ? `${backendUrl}/api/posts/update-posts/${post.slug}`
-        : `${backendUrl}api/posts/create-post`;
+        : `${backendUrl}/api/posts/create-post`;
 
       const method = post ? "PUT" : "POST";
 
@@ -82,6 +86,7 @@ export default function PostForm({ post }) {
 
     return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
+
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
       <div className="w-2/3 px-2">
@@ -96,7 +101,7 @@ export default function PostForm({ post }) {
           placeholder="Slug"
           className="mb-4"
           {...register("slug", { required: true })}
-          readOnly // 👈 optional
+          readOnly
         />
 
         <RTE
@@ -118,15 +123,23 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={post.featuredImage} // ✅ direct Cloudinary image URL
+              src={post.featuredImage}
               alt={post.title}
               className="rounded-lg"
             />
           </div>
         )}
 
+        {/* ✅ Category Select */}
         <Select
-          options={["draft", "published"]} // ✅ use correct values
+          label="Category"
+          className="mb-4"
+          options={blogCategories}
+          {...register("category", { required: true })}
+        />
+
+        <Select
+          options={["draft", "published"]}
           label="Status"
           className="mb-4"
           {...register("status", { required: true })}

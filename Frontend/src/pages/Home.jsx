@@ -52,10 +52,10 @@ function Home() {
     return (
         <div className='w-full py-8'>
             <Container>
-                <div className='flex flex-wrap'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4'>
                     {posts?.map?.((post) => {
                         return (
-                            <div key={post._id} className='p-2 w-1/4'>
+                            <div key={post._id} className='p-2 w-full'>
                                 <PostCard {...post} />
                             </div>
                         );

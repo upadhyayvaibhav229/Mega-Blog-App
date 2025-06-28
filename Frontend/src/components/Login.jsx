@@ -42,7 +42,7 @@ function Login() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r bg-gray-400 px-4">
+        <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
                 <div className="flex flex-col items-center mb-6">
                     <Logo width="80px" />

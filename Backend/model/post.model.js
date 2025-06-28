@@ -33,6 +33,12 @@ const postSchema = new Schema({
         ref: 'User',
         required: true,
     },
+    category: {
+        type: String,
+        enum: ['All', 'Technology', 'Startup', 'Lifestyle', 'Finance'],
+        required: true,
+    }
+
 }, { timestamps: true });
 
 export const Posts = mongoose.model("POST", postSchema);
