@@ -30,7 +30,7 @@ function Signup() {
       dispatch(login(res.data.data));
       console.log("User data:", res.data);
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       console.log(error.response?.data); // debug info
       setError(error.response?.data?.message || "Registration failed");

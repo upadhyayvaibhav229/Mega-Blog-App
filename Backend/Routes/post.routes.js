@@ -6,8 +6,8 @@ import {
   deletePost,
   getAllPosts,
   getFilePreview,
+  getMyPosts,
   getPostBySlug,
-
   updatePost,
 } from "../Controllers/post.controllers.js";
 import { verifyJwt } from "../Middleware/auth.middleware.js";
@@ -26,6 +26,9 @@ router.post(
   upload.single("featuredImage"), // use single instead of fields
   createPost
 );
+// Protected Route
+router.get("/current-user-posts", verifyJwt, getMyPosts);
+
 router.put(
   "/update-posts/:slug",
   verifyJwt,

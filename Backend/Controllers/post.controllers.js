@@ -13,11 +13,11 @@ const createPost = asyncHandler(async (req, res) => {
   const { title, subTitle, slug, content, status, category } = req.body;
 
   console.log("Body", req.body);
-  if ([title, subTitle, slug, content, status, category].some((f) => !f?.trim())) {
+  if (
+    [title, subTitle, slug, content, status, category].some((f) => !f?.trim())
+  ) {
     throw new ApiError(400, "All fields are required");
   }
-
-  
 
   const featuredImagePath = req.file?.path;
   if (!featuredImagePath) {
@@ -45,30 +45,40 @@ const createPost = asyncHandler(async (req, res) => {
 
   await newPost.populate("author", "name email");
   console.log(newPost);
-  
 
   res.status(201).json(new ApiResponse(true, "Post created", newPost));
 });
 
 // get all published post
 const getAllPosts = asyncHandler(async (req, res) => {
-  const posts = await Posts.find({ status: "published" }).sort({ createdAt: -1 });
+  const posts = await Posts.find({ status: "published" }).sort({
+    createdAt: -1,
+  });
 
   return res.status(200).json(
     new ApiResponse(true, posts, "All Posts") // ✅ here: "posts" as 3rd arg
   );
 });
 
+const getMyPosts = async (req, res) => {
+  const userId = req.user._id;
+  const posts = await Posts.find({ userId: userId });
+  res.status(200).json({ data: posts });
+};
 
 // get a single posts by slug (public routes)
 const getPostBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-const post = await Posts.findOne({ slug }).populate("userId", "name email");
+  console.log("slug", slug);
+
+  const post = await Posts.findOne({ slug }).populate("userId", "name email");
+  console.log("post slug", post);
+
   if (!post) {
     throw new ApiError(400, "Post not found");
   }
 
-return res.status(200).json(new ApiResponse(true, post, "Post found"));
+  return res.status(200).json(new ApiResponse(true, post, "Post found"));
 });
 
 const updatePost = asyncHandler(async (req, res) => {
@@ -86,7 +96,7 @@ const updatePost = asyncHandler(async (req, res) => {
   }
 
   // Handle image upload
-  const featuredImagePath = req.file?.path;  // <-- here
+  const featuredImagePath = req.file?.path; // <-- here
   // console.log("featuredImagePath:", featuredImagePath);
   // console.log("req.file:", req.file);
 
@@ -108,7 +118,6 @@ const updatePost = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(true, "Post updated successfully", updatedPost));
 });
-
 
 const deletePost = asyncHandler(async (req, res) => {
   if (!req.user) throw new ApiError(401, "unauthorized to delete blogs");
@@ -222,6 +231,7 @@ export {
   uploadFile,
   deleteFile,
   getFilePreview,
+  getMyPosts,
 };
 
 // TODO: upload file on cloudinary from local
